@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import extract_text_from_pdf, clean_text
+from utils import extract_text_from_pdf, clean_text, calculate_similarity
 
 st.title("AI Resume Screening System")
 
@@ -11,14 +11,14 @@ uploaded_files = st.file_uploader(
     accept_multiple_files=True
 )
 
-if job_desc:
-    job_desc = clean_text(job_desc)
-    st.write("Job Description:", job_desc[:200])
+if uploaded_files and job_desc:
+    job_desc_clean = clean_text(job_desc)
 
-if uploaded_files:
     for file in uploaded_files:
         text = extract_text_from_pdf(file)
-        text = clean_text(text)
+        text_clean = clean_text(text)
+
+        score = calculate_similarity(job_desc_clean, text_clean)
 
         st.write("Resume:", file.name)
-        st.write("DEBUG:", text)
+        st.write("Match Score:", round(score * 100, 2), "%")
